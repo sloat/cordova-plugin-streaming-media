@@ -20,6 +20,8 @@ import android.widget.MediaController;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.VideoView;
+import java.util.Map;
+import java.util.HashMap;
 
 public class SimpleVideoStream extends Activity implements
 	MediaPlayer.OnCompletionListener, MediaPlayer.OnPreparedListener,
@@ -31,6 +33,7 @@ public class SimpleVideoStream extends Activity implements
 	private ProgressBar mProgressBar = null;
 	private String mVideoUrl;
 	private Boolean mShouldAutoClose = true;
+    private String mAuthToken;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +45,7 @@ public class SimpleVideoStream extends Activity implements
 		mVideoUrl = b.getString("mediaUrl");
 		mShouldAutoClose = b.getBoolean("shouldAutoClose");
 		mShouldAutoClose = mShouldAutoClose == null ? true : mShouldAutoClose;
+        mAuthToken = b.getString("authToken");
 
 		RelativeLayout relLayout = new RelativeLayout(this);
 		relLayout.setBackgroundColor(Color.BLACK);
@@ -72,11 +76,14 @@ public class SimpleVideoStream extends Activity implements
 	private void play() {
 		mProgressBar.setVisibility(View.VISIBLE);
 		Uri videoUri = Uri.parse(mVideoUrl);
+        Map<String, String> headers = new HashMap<String, String>();
+        headers.put("Auth", mAuthToken);
+
 		try {
 			mVideoView.setOnCompletionListener(this);
 			mVideoView.setOnPreparedListener(this);
 			mVideoView.setOnErrorListener(this);
-			mVideoView.setVideoURI(videoUri);
+			mVideoView.setVideoURI(videoUri, headers);
 			mMediaController = new MediaController(this);
 			mMediaController.setAnchorView(mVideoView);
 			mMediaController.setMediaPlayer(mVideoView);
